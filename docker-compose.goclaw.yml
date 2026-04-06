@@ -1,0 +1,43 @@
+# Browser sidecar overlay — adds Chrome with extensions for the browser automation tool.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.postgres.yml -f docker-compose.goclaw.yml up -d --build
+#
+# The Chrome sidecar exposes CDP (Chrome DevTools Protocol) on port 9222.
+# GoClaw connects to it automatically via GOCLAW_BROWSER_REMOTE_URL.
+# Extensions: heyetsy + helium10 (mounted from host).
+# noVNC on port 6080 for visual debugging.
+
+services:
+  chrome:
+    image: ghcr.io/trinknx/browser-chrome:latest
+    environment:
+      - RUN_HEADLESS=false
+      - CHROME_CDP_PORT=9222
+      - CHROME_EXTENSIONS=/opt/chrome/extensions/heyetsy,/opt/chrome/extensions/helium10
+    volumes:
+      - /root/goclaw/extensions/heyetsy:/opt/chrome/extensions/heyetsy:ro
+      - /root/goclaw/extensions/helium10:/opt/chrome/extensions/helium10:ro
+      - /root/goclaw/chrome-profile:/opt/chrome/user-data
+    ports:
+      - "${CHROME_CDP_PORT:-9222}:9222"
+      - "${NOVNC_PORT:-6080}:6080"
+    shm_size: 2gb
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:9222/json/version >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2.0'
+    restart: unless-stopped
+
+  goclaw:
+    environment:
+      - GOCLAW_BROWSER_REMOTE_URL=ws://chrome:9222
+    depends_on:
+      chrome:
+        condition: service_healthy

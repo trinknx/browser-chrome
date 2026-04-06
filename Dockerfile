@@ -5,7 +5,7 @@ ARG TARGETARCH
 # Install common deps + browser (Chrome for amd64, Chromium for arm64)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget gnupg2 ca-certificates \
-    xvfb x11vnc fluxbox novnc supervisor \
+    xvfb x11vnc fluxbox novnc supervisor socat \
     fonts-liberation libnss3 libxss1 \
     libasound2 libgtk-3-0 libgbm1 \
     && if [ "$TARGETARCH" = "amd64" ]; then \
