@@ -21,6 +21,8 @@ fi
 
 # Extension loading
 if [ -n "${CHROME_EXTENSIONS}" ]; then
+    # --disable-extensions-except bypasses developer mode requirement
+    ARGS+=(--disable-extensions-except="${CHROME_EXTENSIONS}")
     ARGS+=(--load-extension="${CHROME_EXTENSIONS}")
     echo "Loading extensions: ${CHROME_EXTENSIONS}"
 fi
