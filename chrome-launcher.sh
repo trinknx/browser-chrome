@@ -26,4 +26,4 @@ if [ -n "${CHROME_EXTENSIONS}" ]; then
 fi
 
 echo "Chrome args: ${ARGS[*]}"
-exec google-chrome-stable "${ARGS[@]}" ${CHROME_FLAGS:-}
+exec chrome-browser "${ARGS[@]}" ${CHROME_FLAGS:-}

@@ -1,22 +1,30 @@
-FROM --platform=linux/amd64 debian:bookworm-slim
+FROM debian:bookworm-slim
 
-# Single RUN layer: install all deps + Chrome + cleanup
+ARG TARGETARCH
+
+# Install common deps + browser (Chrome for amd64, Chromium for arm64)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget gnupg2 ca-certificates \
     xvfb x11vnc fluxbox novnc supervisor \
     fonts-liberation libnss3 libxss1 \
     libasound2 libgtk-3-0 libgbm1 \
-    # Add Google Chrome repo
-    && wget -q -O /tmp/google-chrome-key.pub \
-       https://dl.google.com/linux/linux_signing_key.pub \
-    && gpg --dearmor -o /usr/share/keyrings/google-chrome-keyring.gpg \
-       /tmp/google-chrome-key.pub \
-    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] \
-       http://dl.google.com/linux/chrome/deb/ stable main" \
-       > /etc/apt/sources.list.d/google-chrome.list \
-    && apt-get update && apt-get install -y --no-install-recommends \
-       google-chrome-stable \
-    && rm -rf /var/lib/apt/lists/* /tmp/google-chrome-key.pub
+    && if [ "$TARGETARCH" = "amd64" ]; then \
+       wget -q -O /tmp/google-chrome-key.pub \
+         https://dl.google.com/linux/linux_signing_key.pub \
+       && gpg --dearmor -o /usr/share/keyrings/google-chrome-keyring.gpg \
+         /tmp/google-chrome-key.pub \
+       && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] \
+         http://dl.google.com/linux/chrome/deb/ stable main" \
+         > /etc/apt/sources.list.d/google-chrome.list \
+       && apt-get update && apt-get install -y --no-install-recommends \
+         google-chrome-stable \
+       && rm -rf /tmp/google-chrome-key.pub; \
+       ln -sf /usr/bin/google-chrome-stable /usr/bin/chrome-browser; \
+    else \
+       apt-get install -y --no-install-recommends chromium; \
+       ln -sf /usr/bin/chromium /usr/bin/chrome-browser; \
+    fi \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create non-root chrome user
 RUN groupadd --gid 1000 chrome \
