@@ -1,0 +1,32 @@
+services:
+  goclaw-browser:
+    build: .
+    image: goclaw-browser:latest
+    ports:
+      - "9222:9222"   # CDP
+      - "6080:6080"   # noVNC
+      - "5900:5900"   # VNC
+    volumes:
+      - ./extensions:/opt/chrome/extensions
+    environment:
+      - CHROME_CDP_PORT=9222
+      - NOVNC_PORT=6080
+      - VNC_PORT=5900
+      - RESOLUTION=1920x1080x24
+      - RUN_HEADLESS=false
+      - CHROME_FLAGS=
+      - CHROME_EXTENSIONS=
+      - VNC_PASSWORD=
+    shm_size: 2gb
+    restart: unless-stopped
+
+  # Headless CI mode example
+  # goclaw-browser-headless:
+  #   build: .
+  #   image: goclaw-browser:latest
+  #   ports:
+  #     - "9222:9222"
+  #   environment:
+  #     - RUN_HEADLESS=true
+  #   shm_size: 2gb
+  #   restart: unless-stopped
