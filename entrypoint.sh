@@ -41,7 +41,7 @@ user=chrome
 environment=HOME="/home/chrome"
 
 [program:cdp-forward]
-command=/bin/bash -c "socat TCP-LISTEN:${CHROME_CDP_PORT},fork,reuseaddr,bind=0.0.0.0 TCP:127.0.0.1:${CHROME_CDP_PORT}"
+command=/bin/bash -c "socat TCP-LISTEN:${CHROME_CDP_PORT},fork,reuseaddr,bind=0.0.0.0 TCP6:[::1]:${CHROME_CDP_PORT}"
 priority=15
 autorestart=true
 stdout_logfile=/dev/fd/1
