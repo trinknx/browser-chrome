@@ -37,8 +37,9 @@ RUN groupadd --gid 1000 chrome \
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY entrypoint.sh /opt/bin/entrypoint.sh
 COPY chrome-launcher.sh /opt/bin/chrome-launcher.sh
+COPY cdp-forward.sh /opt/bin/cdp-forward.sh
 
-RUN chmod +x /opt/bin/entrypoint.sh /opt/bin/chrome-launcher.sh
+RUN chmod +x /opt/bin/entrypoint.sh /opt/bin/chrome-launcher.sh /opt/bin/cdp-forward.sh
 
 # Environment variables with defaults
 ENV DISPLAY=:99
